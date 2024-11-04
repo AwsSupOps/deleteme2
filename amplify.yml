@@ -1,0 +1,71 @@
+version: 1
+applications:
+  - appRoot: packages/share-backend
+    backend:
+      phases:
+        build:
+          commands:
+            - npm ci --cache .npm --prefer-offline
+            - npx ampx pipeline-deploy --branch $AWS_BRANCH --app-id $AWS_APP_ID
+        postBuild:
+          commands:
+            # enable incoming webhook on frontend app, add url to env vars for backend app
+            # curl -X POST -d {} "$MY_FRONTEND_BUILD_WEBHOOK_URL" -H "Content-Type:application/json"
+            
+    frontend:
+      phases:
+        build:
+          commands:
+            - mkdir ./dist && touch ./dist/index.html
+      artifacts:
+        baseDirectory: dist
+        files:
+          - '**/*'
+      cache:
+        paths:
+          - .npm/**/*
+  # disable auto-builds on this one, we'll trigger with the webhook
+  # app -> app settings -> branch settings -> locate your branch and disable auto-build from the list
+  - appRoot: apps/amplify-vite-react-template
+    frontend:
+      phases:
+        preBuild:
+          commands:
+            - npm ci --cache .npm --prefer-offline
+        build:
+          commands:
+            # move backend app id to an env var
+            # IMPORTANT! this will fail without manually extending the service role to allow reading cfn stack summary (see below)
+            # npx ampx generate outputs --branch master --app-id $MY_AMPLIFY_BACKEND_APP_ID
+            - npx ampx generate outputs --branch dev --app-id 
+            - npm run build
+      artifacts:
+        baseDirectory: dist
+        files:
+          - '**/*'
+      cache:
+        paths:
+          - .npm/**/*
+      # buildPath: /
+# {
+# 	"Version": "2012-10-17",
+# 	"Statement": [
+# 		{
+# 			"Sid": "AllowReadBackendStack",
+# 			"Effect": "Allow",
+# 			"Action": [
+#         "cloudformation:GetTemplateSummary",
+#         "cloudformation:DescribeStacks"
+#       ],
+# 			"Resource": ["arn:aws:cloudformation:us-east-1:xxxxxx:stack/amplify-d1lwl5hdqxqezz-master-branch-9789049d84/e4380d60-97dd-11ef-bbd3-123845a4c18f"]
+# 		},
+#     {
+#       "Sid": "AllowReadBackendBucket",
+#       "Effect": "Allow",
+#       "Action": ["s3:GetObject"],
+#       "Resource": [
+#        "arn:aws:s3:::amplify-d1lwl5hdqxqezz-ma-amplifydataamplifycodege-xxxxx/model-schema.graphql"
+#       ]
+#     }
+# 	]
+# }

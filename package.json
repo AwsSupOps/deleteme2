@@ -1,0 +1,7 @@
+{
+  "name": "react-next-monorepo",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ]
+}
