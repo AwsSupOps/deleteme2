@@ -37,7 +37,7 @@ applications:
             # move backend app id to an env var
             # IMPORTANT! this will fail without manually extending the service role to allow reading cfn stack summary (see below)
             # npx ampx generate outputs --branch master --app-id $MY_AMPLIFY_BACKEND_APP_ID
-            - npx ampx generate outputs --branch dev --app-id 
+            - npx ampx generate outputs --branch dev --app-id  
             - npm run build
       artifacts:
         baseDirectory: dist
