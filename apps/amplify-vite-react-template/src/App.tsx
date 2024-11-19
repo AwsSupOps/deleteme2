@@ -82,6 +82,7 @@ interface SignUpFormElements extends HTMLFormControlsCollection {
   password: HTMLInputElement
 }
 
+
 interface SignUpForm extends HTMLFormElement {
   readonly elements: SignUpFormElements
 }
