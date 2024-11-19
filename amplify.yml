@@ -11,7 +11,7 @@ applications:
           commands:
             # enable incoming webhook on frontend app, add url to env vars for backend app
             # curl -X POST -d {} "$MY_FRONTEND_BUILD_WEBHOOK_URL" -H "Content-Type:application/json"
-          
+            - curl -X POST -d {} "https://webhooks.amplify.us-east-1.amazonaws.com/prod/webhooks?id=674cfbc8-e791-4b04-963c-19addbde21a5&token=8g5LcaTsNrWEaDXUe5AzIfBMdqyd9rD0YV69VoRltE&operation=startbuild" -H "Content-Type:application/json"
             
     frontend:
       phases:
@@ -38,6 +38,7 @@ applications:
             # move backend app id to an env var
             # IMPORTANT! this will fail without manually extending the service role to allow reading cfn stack summary (see below)
             # npx ampx generate outputs --branch master --app-id $MY_AMPLIFY_BACKEND_APP_ID
+            - npx ampx generate outputs --branch main --app-id d311srnceh0bdz
            
             - npm run build
       artifacts:
